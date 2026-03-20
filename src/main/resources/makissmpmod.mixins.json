@@ -4,6 +4,7 @@
   "package": "org.example.makismod.makissmpmod.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AntiMobFarm",
     "DisableEnd",
     "DisableFortune",
     "DisableTrading"
