@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "makissmpmod",
+  "version": "${version}",
+  "name": "makissmpmod",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/makissmpmod/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "fabric-datagen": [
+      "org.example.makismod.makissmpmod.client.MakissmpmodDataGenerator"
+    ],
+    "main": [
+      "org.example.makismod.makissmpmod.Makissmpmod"
+    ]
+  },
+  "mixins": [
+    "makissmpmod.mixins.json",
+    {
+      "config": "makissmpmod.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
