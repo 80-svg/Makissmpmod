@@ -8,13 +8,16 @@
   "contact": {},
   "license": "MIT",
   "icon": "assets/makissmpmod/icon.png",
-  "environment": "server",
+  "environment": "*",
   "entrypoints": {
     "fabric-datagen": [
       "org.example.makismod.makissmpmod.client.MakissmpmodDataGenerator"
     ],
     "main": [
       "org.example.makismod.makissmpmod.Makissmpmod"
+    ],
+    "client": [
+      "org.example.makismod.makissmpmod.client.MakissmpmodClient"
     ]
   },
   "mixins": [

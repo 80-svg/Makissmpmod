@@ -4,6 +4,9 @@
   "package": "org.example.makismod.makissmpmod.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "DisableEnd",
+    "DisableFortune",
+    "DisableTrading"
   ],
   "injectors": {
     "defaultRequire": 1
