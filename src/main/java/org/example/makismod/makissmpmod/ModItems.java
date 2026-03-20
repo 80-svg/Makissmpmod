@@ -42,4 +42,8 @@ public class ModItems {
             .component(net.minecraft.core.component.DataComponents.USE_EFFECTS, net.minecraft.world.item.Items.SHIELD.components().get(net.minecraft.core.component.DataComponents.USE_EFFECTS))
             .component(net.minecraft.core.component.DataComponents.REPAIRABLE, net.minecraft.world.item.Items.SHIELD.components().get(net.minecraft.core.component.DataComponents.REPAIRABLE))
     );
+    public static final Item BRONZE_COIN = register("bronze_coin", properties -> properties != null ? new Item(properties) : null, new Item.Properties());
+    public static final Item SILVER_COIN = register("silver_coin", properties -> properties != null ? new Item(properties) : null, new Item.Properties());
+    public static final Item GOLD_COIN = register("gold_coin", properties -> properties != null ? new Item(properties) : null, new Item.Properties());
+    public static final Item DIAMOND_COIN = register("diamond_coin", properties -> properties != null ? new Item(properties) : null, new Item.Properties());
 }

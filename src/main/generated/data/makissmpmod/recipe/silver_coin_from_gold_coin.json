@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "makissmpmod:gold_coin"
+  ],
+  "result": {
+    "count": 2,
+    "id": "makissmpmod:silver_coin"
+  }
+}

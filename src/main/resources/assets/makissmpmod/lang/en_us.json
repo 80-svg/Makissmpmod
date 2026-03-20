@@ -1,4 +1,8 @@
 {
   "item.makissmpmod.judges_gavel": "Judges gavel",
-  "item.makissmpmod.custom_shield": "Custom Shield"
+  "item.makissmpmod.custom_shield": "Custom Shield",
+  "item.makissmpmod.bronze_coin": "Bronze Coin",
+  "item.makissmpmod.silver_coin": "Silver Coin",
+  "item.makissmpmod.gold_coin": "Gold Coin",
+  "item.makissmpmod.diamond_coin": "Diamond Coin"
 }
