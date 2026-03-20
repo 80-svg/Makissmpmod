@@ -1,7 +1,8 @@
 package org.example.makismod.makissmpmod;
 
 import net.fabricmc.api.ModInitializer;
-//import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import org.example.makismod.makissmpmod.commands.TpaCommand;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -27,6 +28,10 @@ public class Makissmpmod implements ModInitializer {
     @Override
     public void onInitialize() {
         ModItems.initialize();
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            TpaCommand.register(dispatcher);
+        });
         ServerMessageEvents.ALLOW_GAME_MESSAGE.register(((minecraftServer, component, b) -> {
             String msg = component.getString();
             if (msg.contains("joined the game") || msg.contains("left the game")) {
