@@ -10,11 +10,24 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ToolMaterial;
 import org.spongepowered.include.com.google.common.base.Function;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiFunction;
 
 public class ModItems {
+    private static final MaterialVariant[] DEFAULT_MATERIAL_VARIANTS = new MaterialVariant[] {
+            new MaterialVariant("wooden", ToolMaterial.WOOD),
+            new MaterialVariant("stone", ToolMaterial.STONE),
+            new MaterialVariant("iron", ToolMaterial.IRON),
+            new MaterialVariant("golden", ToolMaterial.GOLD),
+            new MaterialVariant("diamond", ToolMaterial.DIAMOND),
+            new MaterialVariant("netherite", ToolMaterial.NETHERITE)
+    };
+
     public static <T extends Item> T register(String name, Function<Item.Properties, T> itemFactory,
             Item.Properties settings) {
         // Create the item key.
@@ -28,6 +41,31 @@ public class ModItems {
         assert item != null;
         Registry.register(BuiltInRegistries.ITEM, itemKey, item);
         return item;
+    }
+
+    public static <T extends Item> Map<String, T> registerMaterialVariants(String baseName,
+            BiFunction<ToolMaterial, Item.Properties, T> itemFactory) {
+        Map<String, T> variants = new LinkedHashMap<>();
+
+        for (MaterialVariant variant : DEFAULT_MATERIAL_VARIANTS) {
+            String itemName = variant.prefix() + "_" + baseName;
+            T item = register(itemName, properties -> itemFactory.apply(variant.tier(), properties),
+                    createTieredItemProperties(variant.tier()));
+            variants.put(variant.prefix(), item);
+        }
+
+        return Map.copyOf(variants);
+    }
+
+    private static Item.Properties createTieredItemProperties(ToolMaterial tier) {
+        Item.Properties properties = new Item.Properties();
+        if (tier == ToolMaterial.NETHERITE) {
+            properties = properties.fireResistant();
+        }
+        return properties;
+    }
+
+    private record MaterialVariant(String prefix, ToolMaterial tier) {
     }
 
     public static void initialize() {
@@ -74,4 +112,6 @@ public class ModItems {
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
     public static final Item DIAMOND_COIN = register("diamond_coin",
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
+    public static final Map<String, DoryItem> DORYS =
+            registerMaterialVariants("dory", DoryItem::new);
 }
