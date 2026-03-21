@@ -1,14 +1,20 @@
 package org.example.makismod.makissmpmod.client;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
+import org.example.makismod.makissmpmod.CustomShieldItem;
 import org.example.makismod.makissmpmod.ModListPayload;
+import org.example.makismod.makissmpmod.ShieldBlockAttackPayload;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class MakissmpmodClient implements ClientModInitializer {
+    private static boolean sentBlockAttackThisPress;
+
     @Override
     public void onInitializeClient() {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
@@ -18,6 +24,22 @@ public class MakissmpmodClient implements ClientModInitializer {
                                             .map(modContainer -> modContainer.getMetadata().getId())
                                                     .toList();
             sender.sendPacket(new ModListPayload.MyPayLoad(modIds));
+        });
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.player == null) {
+                sentBlockAttackThisPress = false;
+                return;
+            }
+
+            boolean shouldTrigger = client.player.isUsingItem()
+                    && client.player.getUseItem().getItem() instanceof CustomShieldItem
+                    && client.options.keyAttack.isDown();
+
+            if (shouldTrigger && !sentBlockAttackThisPress) {
+                ClientPlayNetworking.send(new ShieldBlockAttackPayload(true));
+            }
+
+            sentBlockAttackThisPress = shouldTrigger;
         });
     }
 }

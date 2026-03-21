@@ -10,6 +10,8 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
@@ -42,6 +44,7 @@ public class Makissmpmod implements ModInitializer {
         ServerPlayConnectionEvents.JOIN.register(new ConnectionMessages());
         ServerPlayConnectionEvents.DISCONNECT.register(new ConnectionMessages());
         PayloadTypeRegistry.playC2S().register(ModListPayload.MyPayLoad.ID, ModListPayload.MyPayLoad.CODEC);
+        PayloadTypeRegistry.playC2S().register(ShieldBlockAttackPayload.ID, ShieldBlockAttackPayload.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(ModListPayload.MyPayLoad.ID, ((myPayLoad, context) -> {
             context.server().execute(() -> {
                 List<String> received = myPayLoad.message();
@@ -64,6 +67,30 @@ public class Makissmpmod implements ModInitializer {
                         }
                     }
                 }, 1, TimeUnit.SECONDS);
+            });
+        }));
+        ServerPlayNetworking.registerGlobalReceiver(ShieldBlockAttackPayload.ID, ((payload, context) -> {
+            context.server().execute(() -> {
+                if (!payload.trigger()) {
+                    return;
+                }
+
+                ServerPlayer player = context.player();
+                if (!player.isUsingItem()) {
+                    return;
+                }
+
+                ItemStack stack = player.getUseItem();
+                if (!(stack.getItem() instanceof CustomShieldItem customShieldItem)) {
+                    return;
+                }
+
+                if (player.getCooldowns().isOnCooldown(stack)) {
+                    return;
+                }
+
+                InteractionHand hand = player.getUsedItemHand();
+                customShieldItem.onBlockAttackCombination(player.level(), player, stack, hand);
             });
         }));
     }

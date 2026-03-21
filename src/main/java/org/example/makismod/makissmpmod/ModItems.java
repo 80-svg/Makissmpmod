@@ -2,14 +2,17 @@ package org.example.makismod.makissmpmod;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
-
+import net.minecraft.world.item.Items;
 import org.spongepowered.include.com.google.common.base.Function;
+
+import java.util.Objects;
 
 public class ModItems {
     public static <T extends Item> T register(String name, Function<Item.Properties, T> itemFactory,
@@ -48,21 +51,21 @@ public class ModItems {
     public static final Item JUDGE_GAVEL = register("judges_gavel",
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
     public static final Item CUSTOM_SHIELD = register("custom_shield",
-            properties -> properties != null ? new net.minecraft.world.item.ShieldItem(properties) : null,
+            properties -> properties != null ? new CustomShieldItem(properties) : null,
             new Item.Properties()
                     .durability(500)
                     .component(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS,
-                            net.minecraft.world.item.Items.SHIELD.components()
-                                    .get(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS))
+                            Objects.requireNonNull(Items.SHIELD.components()
+                                    .get(DataComponents.BLOCKS_ATTACKS)))
                     .component(net.minecraft.core.component.DataComponents.EQUIPPABLE,
-                            net.minecraft.world.item.Items.SHIELD.components()
-                                    .get(net.minecraft.core.component.DataComponents.EQUIPPABLE))
+                            Objects.requireNonNull(Items.SHIELD.components()
+                                    .get(DataComponents.EQUIPPABLE)))
                     .component(net.minecraft.core.component.DataComponents.USE_EFFECTS,
-                            net.minecraft.world.item.Items.SHIELD.components()
-                                    .get(net.minecraft.core.component.DataComponents.USE_EFFECTS))
+                            Objects.requireNonNull(Items.SHIELD.components()
+                                    .get(DataComponents.USE_EFFECTS)))
                     .component(net.minecraft.core.component.DataComponents.REPAIRABLE,
-                            net.minecraft.world.item.Items.SHIELD.components()
-                                    .get(net.minecraft.core.component.DataComponents.REPAIRABLE)));
+                            Objects.requireNonNull(Items.SHIELD.components()
+                                    .get(DataComponents.REPAIRABLE))));
     public static final Item BRONZE_COIN = register("bronze_coin",
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
     public static final Item SILVER_COIN = register("silver_coin",
