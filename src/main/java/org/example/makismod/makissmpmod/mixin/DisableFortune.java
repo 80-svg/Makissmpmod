@@ -16,13 +16,13 @@ public class DisableFortune {
     @Inject(method = "getEnchantmentLevel", at = @At("HEAD"), cancellable = true)
     private static void getEnchantmentLevel(Holder<Enchantment> holder, LivingEntity livingEntity, CallbackInfoReturnable<Integer> cir) {
 
-        if (holder.is(Enchantments.FORTUNE)) {
+        if (holder.is(Enchantments.FORTUNE) || holder.is(Enchantments.LUNGE)) {
             cir.setReturnValue(0);
         }
     }
     @Inject(method = "getItemEnchantmentLevel", at = @At("HEAD"), cancellable = true)
     private static void getItemEnchantmentLevel(Holder<Enchantment> holder, ItemStack itemStack, CallbackInfoReturnable<Integer> cir) {
-        if (holder.is(Enchantments.FORTUNE)) {
+        if (holder.is(Enchantments.FORTUNE) || holder.is(Enchantments.LUNGE)) {
             cir.setReturnValue(0);
         }
     }

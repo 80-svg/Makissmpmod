@@ -2,27 +2,18 @@ package org.example.makismod.makissmpmod;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import org.example.makismod.makissmpmod.commands.TpaCommand;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-//import net.minecraft.resources.Identifier;
-//import net.minecraft.util.datafix.fixes.GameRuleRegistryFix;
-//import net.minecraft.world.level.gamerules.GameRule;
-//import net.minecraft.world.level.gamerules.GameRuleCategory;
-//import net.minecraft.world.level.gamerules.GameRules;
 
 public class Makissmpmod implements ModInitializer {
     public static final String MOD_ID = "makissmpmod";
@@ -43,6 +34,7 @@ public class Makissmpmod implements ModInitializer {
         }));
         ServerPlayConnectionEvents.JOIN.register(new ConnectionMessages());
         ServerPlayConnectionEvents.DISCONNECT.register(new ConnectionMessages());
+        ServerTickEvents.END_SERVER_TICK.register(CustomShieldItem::tickActiveDashes);
         PayloadTypeRegistry.playC2S().register(ModListPayload.MyPayLoad.ID, ModListPayload.MyPayLoad.CODEC);
         PayloadTypeRegistry.playC2S().register(ShieldBlockAttackPayload.ID, ShieldBlockAttackPayload.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(ModListPayload.MyPayLoad.ID, ((myPayLoad, context) -> {
@@ -75,22 +67,7 @@ public class Makissmpmod implements ModInitializer {
                     return;
                 }
 
-                ServerPlayer player = context.player();
-                if (!player.isUsingItem()) {
-                    return;
-                }
-
-                ItemStack stack = player.getUseItem();
-                if (!(stack.getItem() instanceof CustomShieldItem customShieldItem)) {
-                    return;
-                }
-
-                if (player.getCooldowns().isOnCooldown(stack)) {
-                    return;
-                }
-
-                InteractionHand hand = player.getUsedItemHand();
-                customShieldItem.onBlockAttackCombination(player.level(), player, stack, hand);
+                CustomShieldItem.tryStartDash(context.player());
             });
         }));
     }

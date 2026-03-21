@@ -4,6 +4,7 @@
   "package": "org.example.makismod.makissmpmod.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "SpearCancelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

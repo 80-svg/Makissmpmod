@@ -31,8 +31,7 @@ public class MakissmpmodClient implements ClientModInitializer {
                 return;
             }
 
-            boolean shouldTrigger = client.player.isUsingItem()
-                    && client.player.getUseItem().getItem() instanceof CustomShieldItem
+            boolean shouldTrigger = CustomShieldItem.isBlockingComboReady(client.player)
                     && client.options.keyAttack.isDown();
 
             if (shouldTrigger && !sentBlockAttackThisPress) {
