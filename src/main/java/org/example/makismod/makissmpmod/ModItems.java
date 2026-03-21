@@ -14,11 +14,14 @@ import net.minecraft.world.item.ToolMaterial;
 import org.spongepowered.include.com.google.common.base.Function;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 public class ModItems {
+    private static final Set<Item> GENERATED_FLAT_ITEMS = new LinkedHashSet<>();
     private static final MaterialVariant[] DEFAULT_MATERIAL_VARIANTS = new MaterialVariant[] {
             new MaterialVariant("wooden", ToolMaterial.WOOD),
             new MaterialVariant("stone", ToolMaterial.STONE),
@@ -52,9 +55,14 @@ public class ModItems {
             T item = register(itemName, properties -> itemFactory.apply(variant.tier(), properties),
                     createTieredItemProperties(variant.tier()));
             variants.put(variant.prefix(), item);
+            GENERATED_FLAT_ITEMS.add(item);
         }
 
         return Map.copyOf(variants);
+    }
+
+    public static Set<Item> generatedFlatItems() {
+        return Set.copyOf(GENERATED_FLAT_ITEMS);
     }
 
     private static Item.Properties createTieredItemProperties(ToolMaterial tier) {

@@ -4,5 +4,11 @@
   "item.makissmpmod.bronze_coin": "Bronze Coin",
   "item.makissmpmod.silver_coin": "Silver Coin",
   "item.makissmpmod.gold_coin": "Gold Coin",
-  "item.makissmpmod.diamond_coin": "Diamond Coin"
+  "item.makissmpmod.diamond_coin": "Diamond Coin",
+  "item.makissmpmod.wooden_dory": "Wooden Dory",
+  "item.makissmpmod.stone_dory": "Stone Dory",
+  "item.makissmpmod.iron_dory": "Iron Dory",
+  "item.makissmpmod.golden_dory": "Golden Dory",
+  "item.makissmpmod.diamond_dory": "Diamond Dory",
+  "item.makissmpmod.netherite_dory": "Netherite Dory"
 }
