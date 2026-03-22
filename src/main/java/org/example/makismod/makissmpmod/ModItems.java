@@ -7,10 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.*;
 import org.spongepowered.include.com.google.common.base.Function;
 
 import java.util.LinkedHashMap;
@@ -46,8 +43,13 @@ public class ModItems {
         return item;
     }
 
-    public static <T extends Item> Map<String, T> registerMaterialVariants(String baseName,
+    public static <T extends Item> Map<String, T> registerMaterialVariants(ResourceKey<CreativeModeTab> cmt, String baseName,
             BiFunction<ToolMaterial, Item.Properties, T> itemFactory) {
+        return registerMaterialVariants(cmt, baseName, itemFactory, true);
+    }
+
+    public static <T extends Item> Map<String, T> registerMaterialVariants(ResourceKey<CreativeModeTab> cmt,
+            String baseName, BiFunction<ToolMaterial, Item.Properties, T> itemFactory, boolean generateFlatModel) {
         Map<String, T> variants = new LinkedHashMap<>();
 
         for (MaterialVariant variant : DEFAULT_MATERIAL_VARIANTS) {
@@ -55,7 +57,10 @@ public class ModItems {
             T item = register(itemName, properties -> itemFactory.apply(variant.tier(), properties),
                     createTieredItemProperties(variant.tier()));
             variants.put(variant.prefix(), item);
-            GENERATED_FLAT_ITEMS.add(item);
+            if (generateFlatModel) {
+                GENERATED_FLAT_ITEMS.add(item);
+            }
+            addItemsToCreativeModTab(cmt, item);
         }
 
         return Map.copyOf(variants);
@@ -71,6 +76,11 @@ public class ModItems {
             properties = properties.fireResistant();
         }
         return properties;
+    }
+
+    public static void addItemsToCreativeModTab(ResourceKey<CreativeModeTab> tab, Item item) {
+        ItemGroupEvents.modifyEntriesEvent(tab)
+                .register(fabricItemGroupEntries -> fabricItemGroupEntries.accept(item));
     }
 
     private record MaterialVariant(String prefix, ToolMaterial tier) {
@@ -122,5 +132,6 @@ public class ModItems {
     public static final Item DIAMOND_COIN = register("diamond_coin",
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
     public static final Map<String, DoryItem> DORYS =
-            registerMaterialVariants("dory", DoryItem::new);
+            registerMaterialVariants(CreativeModeTabs.COMBAT, "dory", DoryItem::new, false);
+
 }
