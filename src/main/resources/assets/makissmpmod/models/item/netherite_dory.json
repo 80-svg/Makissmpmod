@@ -5,16 +5,16 @@
   },
   "display": {
     "thirdperson_righthand": {
-      "scale": [ 1.35, 1.35, 1.35 ]
+      "scale": [ 1.5, 2, 1.5 ]
     },
     "thirdperson_lefthand": {
-      "scale": [ 1.35, 1.35, 1.35 ]
+      "scale": [ 1.5, 2, 1.5 ]
     },
     "firstperson_righthand": {
-      "scale": [ 1.5, 1.5, 1.5 ]
+      "scale": [ 2, 2, 2 ]
     },
     "firstperson_lefthand": {
-      "scale": [ 1.5, 1.5, 1.5 ]
+      "scale": [ 2, 2, 2 ]
     },
     "gui": {
       "scale": [ 1.25, 1.25, 1.25 ]

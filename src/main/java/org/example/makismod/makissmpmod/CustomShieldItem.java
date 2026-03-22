@@ -13,6 +13,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -79,7 +80,8 @@ public class CustomShieldItem extends ShieldItem {
     private void startDash(ServerLevel level, ServerPlayer player, ItemStack shieldStack) {
         ItemStack spearStack = player.getMainHandItem();
         int cooldownTicks = getDashCooldownTicks(level, shieldStack);
-
+        FoodData foodData = player.getFoodData();
+        foodData.setFoodLevel(foodData.getFoodLevel() - 4);
         player.getCooldowns().addCooldown(shieldStack, cooldownTicks);
         shieldStack.hurtAndBreak(SHIELD_DURABILITY_COST, player, EquipmentSlot.OFFHAND);
         spearStack.hurtAndBreak(SPEAR_DURABILITY_COST, player, EquipmentSlot.MAINHAND);
@@ -90,7 +92,6 @@ public class CustomShieldItem extends ShieldItem {
         ACTIVE_DASHES.put(player.getUUID(), new ActiveDash(look, DASH_DURATION_TICKS, new HashSet<>()));
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SPEAR_ATTACK,
                 SoundSource.PLAYERS, 1.0F, 1.0F);
-        player.sendSystemMessage(Component.literal("Shield dash triggered."));
     }
 
     private static int getDashCooldownTicks(ServerLevel level, ItemStack shieldStack) {
