@@ -1,5 +1,7 @@
 package org.example.makismod.makissmpmod;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.MinecraftServer;
@@ -11,9 +13,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -29,6 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CustomShieldItem extends ShieldItem {
     private static final int BLOCK_ATTACK_COOLDOWN_TICKS = 200;
+    private static final int HOTUP_COOLDOWN_REDUCTION_PER_LEVEL = 40;
+    private static final int MIN_BLOCK_ATTACK_COOLDOWN_TICKS = 80;
     private static final int DASH_DURATION_TICKS = 6;
     private static final int SHIELD_DURABILITY_COST = 2;
     private static final int SPEAR_DURABILITY_COST = 2;
@@ -36,7 +41,7 @@ public class CustomShieldItem extends ShieldItem {
     private static final double DASH_SPEED = 3.25D;
     private static final double DASH_VERTICAL_BOOST = 0.18D;
     private static final double DASH_REACH = 1.75D;
-    private static final double MAX_UPWARD_DISTANCE_SCALE = 0.5D;
+    private static final double MAX_UPWARD_DISTANCE_SCALE = 0.25D;
     private static final Map<UUID, ActiveDash> ACTIVE_DASHES = new ConcurrentHashMap<>();
 
     public CustomShieldItem(Properties properties) {
@@ -48,7 +53,7 @@ public class CustomShieldItem extends ShieldItem {
         ItemStack mainHandStack = player.getMainHandItem();
 
         return offhandStack.getItem() instanceof CustomShieldItem
-                && mainHandStack.getUseAnimation() == ItemUseAnimation.SPEAR;
+                && mainHandStack.getItem() instanceof DoryItem;
     }
 
     public static boolean isBlockingComboReady(Player player) {
@@ -68,13 +73,14 @@ public class CustomShieldItem extends ShieldItem {
             return;
         }
 
-        ((CustomShieldItem) shieldStack.getItem()).startDash((ServerLevel) player.level(), player, shieldStack);
+        ((CustomShieldItem) shieldStack.getItem()).startDash(player.level(), player, shieldStack);
     }
 
     private void startDash(ServerLevel level, ServerPlayer player, ItemStack shieldStack) {
         ItemStack spearStack = player.getMainHandItem();
+        int cooldownTicks = getDashCooldownTicks(level, shieldStack);
 
-        player.getCooldowns().addCooldown(shieldStack, BLOCK_ATTACK_COOLDOWN_TICKS);
+        player.getCooldowns().addCooldown(shieldStack, cooldownTicks);
         shieldStack.hurtAndBreak(SHIELD_DURABILITY_COST, player, EquipmentSlot.OFFHAND);
         spearStack.hurtAndBreak(SPEAR_DURABILITY_COST, player, EquipmentSlot.MAINHAND);
 
@@ -85,6 +91,15 @@ public class CustomShieldItem extends ShieldItem {
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SPEAR_ATTACK,
                 SoundSource.PLAYERS, 1.0F, 1.0F);
         player.sendSystemMessage(Component.literal("Shield dash triggered."));
+    }
+
+    private static int getDashCooldownTicks(ServerLevel level, ItemStack shieldStack) {
+        Holder<Enchantment> hotup = level.registryAccess()
+                .lookupOrThrow(Registries.ENCHANTMENT)
+                .getOrThrow(ModEnchantments.HOTUP);
+        int hotupLevel = EnchantmentHelper.getItemEnchantmentLevel(hotup, shieldStack);
+        return Math.max(MIN_BLOCK_ATTACK_COOLDOWN_TICKS,
+                BLOCK_ATTACK_COOLDOWN_TICKS - hotupLevel * HOTUP_COOLDOWN_REDUCTION_PER_LEVEL);
     }
 
     public static void tickActiveDashes(MinecraftServer server) {
@@ -102,7 +117,7 @@ public class CustomShieldItem extends ShieldItem {
 
             Vec3 dashVelocity = createDashVelocity(activeDash.direction(), 0.35D);
             applyDashVelocity(player, dashVelocity);
-            damageDashTargets((ServerLevel) player.level(), player, activeDash);
+            damageDashTargets(player.level(), player, activeDash);
             activeDash.ticksRemaining--;
 
             if (activeDash.ticksRemaining <= 0) {

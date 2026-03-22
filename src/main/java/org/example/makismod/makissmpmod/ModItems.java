@@ -100,6 +100,7 @@ public class ModItems {
             properties -> properties != null ? new CustomShieldItem(properties) : null,
             new Item.Properties()
                     .durability(500)
+                    .enchantable(15)
                     .component(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS,
                             Objects.requireNonNull(Items.SHIELD.components()
                                     .get(DataComponents.BLOCKS_ATTACKS)))
