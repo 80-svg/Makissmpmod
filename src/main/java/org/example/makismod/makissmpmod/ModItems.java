@@ -105,7 +105,6 @@ public class ModItems {
     );
     public static final Item JUDGE_GAVEL = register("judges_gavel",
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
-    //TODO: bounce back
     public static final Item CUSTOM_SHIELD = register("custom_shield",
             properties -> properties != null ? new CustomShieldItem(properties) : null,
             new Item.Properties()

@@ -33,18 +33,21 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CustomShieldItem extends ShieldItem {
     private static final int BLOCK_ATTACK_COOLDOWN_TICKS = 200;
+    private static final int BOUNCE_BACK_COOLDOWN_TICKS = 20;
     private static final int HOTUP_COOLDOWN_REDUCTION_PER_LEVEL = 40;
     private static final int MIN_BLOCK_ATTACK_COOLDOWN_TICKS = 80;
     private static final int DASH_DURATION_TICKS = 6;
     private static final int SHIELD_DURABILITY_COST = 2;
     private static final int SPEAR_DURABILITY_COST = 2;
     private static final float DASH_DAMAGE = 16.0F;
+    private static final float BOUNCE_BACK_DAMAGE = 5.0F;
     private static final double DASH_SPEED = 3.25D;
+    private static final double BOUNCE_BACK_DASH_SPEED = 1.7D;
     private static final double DASH_VERTICAL_BOOST = 0.18D;
     private static final double DASH_REACH = 1.75D;
     private static final double MAX_UPWARD_DISTANCE_SCALE = 0.25D;
+    private static final double BOUNCE_BACK_RECOIL_SPEED = 2.6D;
     private static final Map<UUID, ActiveDash> ACTIVE_DASHES = new ConcurrentHashMap<>();
-
     public CustomShieldItem(Properties properties) {
         super(properties);
     }
@@ -79,27 +82,35 @@ public class CustomShieldItem extends ShieldItem {
 
     private void startDash(ServerLevel level, ServerPlayer player, ItemStack shieldStack) {
         ItemStack spearStack = player.getMainHandItem();
-        int cooldownTicks = getDashCooldownTicks(level, shieldStack);
+        boolean hasBounceBack = hasBounceBack(level, shieldStack);
+        int cooldownTicks = getDashCooldownTicks(level, shieldStack, hasBounceBack);
         FoodData foodData = player.getFoodData();
-        foodData.setFoodLevel(foodData.getFoodLevel() - 4);
+        foodData.setFoodLevel(Math.max(0, foodData.getFoodLevel() - (hasBounceBack ? 1 : 4)));
         player.getCooldowns().addCooldown(shieldStack, cooldownTicks);
         shieldStack.hurtAndBreak(SHIELD_DURABILITY_COST, player, EquipmentSlot.OFFHAND);
         spearStack.hurtAndBreak(SPEAR_DURABILITY_COST, player, EquipmentSlot.MAINHAND);
 
         Vec3 look = player.getLookAngle().normalize();
-        Vec3 dashVelocity = createDashVelocity(look, 1.0D);
+        Vec3 dashVelocity = createDashVelocity(look, 1.0D, hasBounceBack ? BOUNCE_BACK_DASH_SPEED : DASH_SPEED);
         applyDashVelocity(player, dashVelocity);
-        ACTIVE_DASHES.put(player.getUUID(), new ActiveDash(look, DASH_DURATION_TICKS, new HashSet<>()));
+        ACTIVE_DASHES.put(player.getUUID(), new ActiveDash(look, DASH_DURATION_TICKS, new HashSet<>(), hasBounceBack));
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SPEAR_ATTACK,
                 SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
-    private static int getDashCooldownTicks(ServerLevel level, ItemStack shieldStack) {
+    private static boolean hasBounceBack(ServerLevel level, ItemStack shieldStack) {
+        Holder<Enchantment> bounceBack = level.registryAccess()
+                .lookupOrThrow(Registries.ENCHANTMENT)
+                .getOrThrow(ModEnchantments.BOUNCE_BACK);
+        return EnchantmentHelper.getItemEnchantmentLevel(bounceBack, shieldStack) > 0;
+    }
+
+    private static int getDashCooldownTicks(ServerLevel level, ItemStack shieldStack, boolean hasBounceBack) {
         Holder<Enchantment> hotup = level.registryAccess()
                 .lookupOrThrow(Registries.ENCHANTMENT)
                 .getOrThrow(ModEnchantments.HOTUP);
         int hotupLevel = EnchantmentHelper.getItemEnchantmentLevel(hotup, shieldStack);
-        return Math.max(MIN_BLOCK_ATTACK_COOLDOWN_TICKS,
+        return hasBounceBack ? BOUNCE_BACK_COOLDOWN_TICKS : Math.max(MIN_BLOCK_ATTACK_COOLDOWN_TICKS,
                 BLOCK_ATTACK_COOLDOWN_TICKS - hotupLevel * HOTUP_COOLDOWN_REDUCTION_PER_LEVEL);
     }
 
@@ -116,9 +127,12 @@ public class CustomShieldItem extends ShieldItem {
                 continue;
             }
 
-            Vec3 dashVelocity = createDashVelocity(activeDash.direction(), 0.35D);
+            double dashSpeed = activeDash.hasBounceBack() ? BOUNCE_BACK_DASH_SPEED : DASH_SPEED;
+            Vec3 dashVelocity = createDashVelocity(activeDash.direction(), 0.35D, dashSpeed);
             applyDashVelocity(player, dashVelocity);
-            damageDashTargets(player.level(), player, activeDash);
+            if (damageDashTargets(player.level(), player, activeDash)) {
+                continue;
+            }
             activeDash.ticksRemaining--;
 
             if (activeDash.ticksRemaining <= 0) {
@@ -127,7 +141,7 @@ public class CustomShieldItem extends ShieldItem {
         }
     }
 
-    private static void damageDashTargets(ServerLevel level, Player player, ActiveDash activeDash) {
+    private static boolean damageDashTargets(ServerLevel level, Player player, ActiveDash activeDash) {
         Vec3 look = activeDash.direction();
         AABB hitbox = player.getBoundingBox().expandTowards(look.scale(DASH_REACH)).inflate(1.0D);
         List<LivingEntity> targets = level.getEntitiesOfClass(LivingEntity.class, hitbox,
@@ -135,14 +149,27 @@ public class CustomShieldItem extends ShieldItem {
                         && entity.isAlive()
                         && entity.attackable()
                         && !activeDash.hitEntities().contains(entity.getUUID()));
+        final boolean[] bouncedThisHit = {false};
 
         targets.stream()
                 .sorted(Comparator.comparingDouble(player::distanceToSqr))
-                .forEach(target -> {
-                    target.hurtServer(level, player.damageSources().playerAttack(player), DASH_DAMAGE);
+                .findFirst().ifPresent(target -> {
+                    float dashDamage = activeDash.hasBounceBack() ? BOUNCE_BACK_DAMAGE : DASH_DAMAGE;
+                    target.hurtServer(level, player.damageSources().playerAttack(player), dashDamage);
                     target.knockback(1.5D, -look.x, -look.z);
-                    activeDash.hitEntities().add(target.getUUID());
+                    activeDash.hitEntities.add(target.getUUID());
+                    if (activeDash.shouldBounceBack()) {
+                        Vec3 recoilDirection = activeDash.direction().reverse();
+                        activeDash.bounceBack(recoilDirection);
+                        applyDashVelocity((ServerPlayer) player, recoilDirection.scale(BOUNCE_BACK_RECOIL_SPEED));
+                        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SHIELD_BLOCK,
+                                SoundSource.PLAYERS, 1.0F, 1.2F);
+                        bouncedThisHit[0] = true;
+                    } else {
+                        player.hurtMarked = true;
+                    }
                 });
+        return bouncedThisHit[0];
     }
 
     private static void applyDashVelocity(ServerPlayer player, Vec3 dashVelocity) {
@@ -152,21 +179,24 @@ public class CustomShieldItem extends ShieldItem {
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }
 
-    private static Vec3 createDashVelocity(Vec3 look, double verticalBoostScale) {
+    private static Vec3 createDashVelocity(Vec3 look, double verticalBoostScale, double dashSpeed) {
         double upwardAim = Math.max(look.y, 0.0D);
         double distanceScale = 1.0D - ((1.0D - MAX_UPWARD_DISTANCE_SCALE) * upwardAim);
-        return look.scale(DASH_SPEED * distanceScale).add(0.0D, DASH_VERTICAL_BOOST * verticalBoostScale, 0.0D);
+        return look.scale(dashSpeed * distanceScale).add(0.0D, DASH_VERTICAL_BOOST * verticalBoostScale, 0.0D);
     }
 
     private static final class ActiveDash {
-        private final Vec3 direction;
+        private Vec3 direction;
         private int ticksRemaining;
         private final Set<UUID> hitEntities;
+        private final boolean hasBounceBack;
+        private boolean hasBouncedBack;
 
-        private ActiveDash(Vec3 direction, int ticksRemaining, Set<UUID> hitEntities) {
+        private ActiveDash(Vec3 direction, int ticksRemaining, Set<UUID> hitEntities, boolean hasBounceBack) {
             this.direction = direction;
             this.ticksRemaining = ticksRemaining;
             this.hitEntities = hitEntities;
+            this.hasBounceBack = hasBounceBack;
         }
 
         private Vec3 direction() {
@@ -175,6 +205,23 @@ public class CustomShieldItem extends ShieldItem {
 
         private Set<UUID> hitEntities() {
             return this.hitEntities;
+        }
+
+        private boolean hasBounceBack() {
+            return this.hasBounceBack;
+        }
+
+        private boolean shouldBounceBack() {
+            return this.hasBounceBack && !this.hasBouncedBack;
+        }
+
+        private boolean hasBouncedBack() {
+            return this.hasBouncedBack;
+        }
+
+        private void bounceBack(Vec3 recoilDirection) {
+            this.direction = recoilDirection;
+            this.hasBouncedBack = true;
         }
     }
 }

@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "makissmpmod:hotup"
+    "makissmpmod:hotup",
+    "makissmpmod:bounce_back"
   ]
 }
