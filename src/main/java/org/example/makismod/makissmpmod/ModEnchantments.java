@@ -8,7 +8,8 @@ import net.minecraft.world.item.enchantment.Enchantment;
 public final class ModEnchantments {
     public static final ResourceKey<Enchantment> HOTUP = ResourceKey.create(Registries.ENCHANTMENT,
             Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, "hotup"));
-
+    public static final ResourceKey<Enchantment> BOUNCE_BACK = ResourceKey.create(Registries.ENCHANTMENT,
+            Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, "bounceback"));
     private ModEnchantments() {
     }
 }

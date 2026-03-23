@@ -28,10 +28,8 @@ public class Makissmpmod implements ModInitializer {
         });
         ServerMessageEvents.ALLOW_GAME_MESSAGE.register(((minecraftServer, component, b) -> {
             String msg = component.getString();
-            if (msg.contains("joined the game") || msg.contains("left the game")) {
-                return false;
-            }
-            return true;
+            List<String> blockedMessages = List.of("joined the game", "left the game");
+            return !blockedMessages.contains(msg);
         }));
         ServerPlayConnectionEvents.JOIN.register(new ConnectionMessages());
         ServerPlayConnectionEvents.DISCONNECT.register(new ConnectionMessages());
