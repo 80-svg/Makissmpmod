@@ -100,11 +100,12 @@ public class ModItems {
             BuiltInRegistries.DATA_COMPONENT_TYPE,
             Identifier.fromNamespaceAndPath("makissmpmod", "icarus_percent"),
             DataComponentType.<Float>builder()
-                    .persistent(Codec.floatRange(0, 1))
+                    .persistent(Codec.floatRange(0, 3))
                     .build()
     );
     public static final Item JUDGE_GAVEL = register("judges_gavel",
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
+    //TODO: bounce back
     public static final Item CUSTOM_SHIELD = register("custom_shield",
             properties -> properties != null ? new CustomShieldItem(properties) : null,
             new Item.Properties()
@@ -133,7 +134,7 @@ public class ModItems {
     public static final Map<String, DoryItem> DORYS =
             registerMaterialVariants(MAKIS_TAB_KEY, "dory", DoryItem::new, false);
     public static final Item ICARUS_WINGS = register("icarus_wings",
-            properties -> properties != null ? new Item(properties) : null,
+            properties -> properties != null ? new IcarusWingsItem(properties) : null,
             new Item.Properties()
                     .durability(432)
                     .component(DataComponents.EQUIPPABLE,
@@ -144,7 +145,8 @@ public class ModItems {
                                     .get(DataComponents.GLIDER)))
                     .component(DataComponents.REPAIRABLE,
                             Objects.requireNonNull(Items.ELYTRA.components()
-                                    .get(DataComponents.REPAIRABLE))));
+                                    .get(DataComponents.REPAIRABLE)))
+                    .component(ICARUS_PERCENT, 3.0f));
     public static final CreativeModeTab MAKIS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, MAKIS_TAB_KEY,
             CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
                     .title(Component.translatable("itemGroup." + Makissmpmod.MOD_ID))

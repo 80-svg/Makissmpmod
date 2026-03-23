@@ -20,6 +20,7 @@ public class Makissmpmod implements ModInitializer {
     public static final Set<UUID> payloadPlayers = new HashSet<>();
     @Override
     public void onInitialize() {
+        ModEffects.initialize();
         ModItems.initialize();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -35,6 +36,8 @@ public class Makissmpmod implements ModInitializer {
         ServerPlayConnectionEvents.JOIN.register(new ConnectionMessages());
         ServerPlayConnectionEvents.DISCONNECT.register(new ConnectionMessages());
         ServerTickEvents.END_SERVER_TICK.register(CustomShieldItem::tickActiveDashes);
+        ServerTickEvents.END_SERVER_TICK.register(IcarusWingsItem::tickFlightDrain);
+        ServerTickEvents.END_SERVER_TICK.register(ModEffects::tickWaxCoatedPlayers);
         PayloadTypeRegistry.playC2S().register(ModListPayload.MyPayLoad.ID, ModListPayload.MyPayLoad.CODEC);
         PayloadTypeRegistry.playC2S().register(ShieldBlockAttackPayload.ID, ShieldBlockAttackPayload.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(ModListPayload.MyPayLoad.ID, ((myPayLoad, context) -> {

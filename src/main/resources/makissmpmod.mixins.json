@@ -7,7 +7,8 @@
     "AntiMobFarm",
     "DisableEnd",
     "DisableFortune",
-    "DisableTrading"
+    "DisableTrading",
+    "PreserveWaxCoatedOnMilk"
   ],
   "injectors": {
     "defaultRequire": 1
