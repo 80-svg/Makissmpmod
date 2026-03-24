@@ -4,6 +4,9 @@
   "package": "org.example.makismod.makissmpmod.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "EyeClosureOverlayMixin",
+    "LethargyCameraMixin",
+    "LethargyVignetteMixin",
     "SpearCancelMixin"
   ],
   "injectors": {

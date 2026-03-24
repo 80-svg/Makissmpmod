@@ -10,7 +10,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 import org.spongepowered.include.com.google.common.base.Function;
 
 import java.util.*;
@@ -84,6 +90,11 @@ public class ModItems {
                 .register(fabricItemGroupEntries -> fabricItemGroupEntries.accept(item));
     }
 
+    public static void addItemStackToCreativeModTab(ResourceKey<CreativeModeTab> tab, ItemStack stack) {
+        ItemGroupEvents.modifyEntriesEvent(tab)
+                .register(fabricItemGroupEntries -> fabricItemGroupEntries.accept(stack));
+    }
+
     private record MaterialVariant(String prefix, ToolMaterial tier) {
     }
 
@@ -95,6 +106,7 @@ public class ModItems {
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.GOLD_COIN);
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.DIAMOND_COIN);
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.ICARUS_WINGS);
+        addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.LOTUS);
     }
     public static final DataComponentType<Float> ICARUS_PERCENT = Registry.register(
             BuiltInRegistries.DATA_COMPONENT_TYPE,
@@ -130,6 +142,25 @@ public class ModItems {
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
     public static final Item DIAMOND_COIN = register("diamond_coin",
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
+    public static final Item LOTUS = register("lotus",
+            properties -> properties != null ? new Item(properties) : null,
+            new Item.Properties()
+                    .food(
+                            new FoodProperties.Builder()
+                                    .nutrition(4)
+                                    .saturationModifier(0.8F)
+                                    .alwaysEdible()
+                                    .build(),
+                            Consumable.builder()
+                                    .consumeSeconds(Consumables.DEFAULT_FOOD.consumeSeconds())
+                                    .animation(ItemUseAnimation.EAT)
+                                    .sound(Consumables.DEFAULT_FOOD.sound())
+                                    .hasConsumeParticles(true)
+                                    .onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.SATURATION, 600, 0)))
+                                    .onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.REGENERATION, 600, 0)))
+                                    .onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(ModEffects.LETHARGY, 600, 0)))
+                                    .build()
+                    ));
     public static final Map<String, DoryItem> DORYS =
             registerMaterialVariants(MAKIS_TAB_KEY, "dory", DoryItem::new, false);
     public static final Item ICARUS_WINGS = register("icarus_wings",

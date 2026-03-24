@@ -22,6 +22,7 @@ public class Makissmpmod implements ModInitializer {
     public void onInitialize() {
         ModEffects.initialize();
         ModItems.initialize();
+        ModPotions.initialize();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             TpaCommand.register(dispatcher);

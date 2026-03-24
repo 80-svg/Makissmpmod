@@ -6,6 +6,7 @@
   "item.makissmpmod.silver_coin": "Silver Coin",
   "item.makissmpmod.gold_coin": "Gold Coin",
   "item.makissmpmod.diamond_coin": "Diamond Coin",
+  "item.makissmpmod.lotus": "Lotus",
   "item.makissmpmod.wooden_dory": "Wooden Dory",
   "item.makissmpmod.stone_dory": "Stone Dory",
   "item.makissmpmod.iron_dory": "Iron Dory",
@@ -15,5 +16,13 @@
   "enchantment.makissmpmod.hotup": "Hotup",
   "enchantment.makissmpmod.bounce_back": "Bounce Back",
   "item.makissmpmod.icarus_wings": "Icarus Wings",
-  "effect.makissmpmod.wax_coated": "Wax Coated"
+  "effect.makissmpmod.wax_coated": "Wax Coated",
+  "effect.makissmpmod.lethargy": "Lethargy",
+  "effect.makissmpmod.drowsyness": "Drowsyness",
+  "item.minecraft.potion.effect.drowsyness": "Potion of Drowsyness",
+  "item.minecraft.splash_potion.effect.drowsyness": "Splash Potion of Drowsyness",
+  "item.minecraft.lingering_potion.effect.drowsyness": "Lingering Potion of Drowsyness",
+  "item.minecraft.potion.effect.long_drowsyness": "Potion of Long Drowsyness",
+  "item.minecraft.splash_potion.effect.long_drowsyness": "Splash Potion of Long Drowsyness",
+  "item.minecraft.lingering_potion.effect.long_drowsyness": "Lingering Potion of Long Drowsyness"
 }
