@@ -107,6 +107,7 @@ public class ModItems {
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.DIAMOND_COIN);
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.ICARUS_WINGS);
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.LOTUS);
+        addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.BABY_OIL);
     }
     public static final DataComponentType<Float> ICARUS_PERCENT = Registry.register(
             BuiltInRegistries.DATA_COMPONENT_TYPE,
@@ -161,6 +162,8 @@ public class ModItems {
                                     .onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(ModEffects.LETHARGY, 600, 0)))
                                     .build()
                     ));
+    public static final Item BABY_OIL = register("baby_oil",
+            properties -> properties != null ? new Item(properties) : null, new Item.Properties());
     public static final Map<String, DoryItem> DORYS =
             registerMaterialVariants(MAKIS_TAB_KEY, "dory", DoryItem::new, false);
     public static final Item ICARUS_WINGS = register("icarus_wings",

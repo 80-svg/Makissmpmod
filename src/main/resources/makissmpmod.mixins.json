@@ -8,7 +8,9 @@
     "DisableEnd",
     "DisableFortune",
     "DisableTrading",
-    "PreserveWaxCoatedOnMilk"
+    "PlayerNickMixin",
+    "PreserveWaxCoatedOnMilk",
+    "ServerPlayerNickMixin"
   ],
   "injectors": {
     "defaultRequire": 1

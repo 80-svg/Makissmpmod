@@ -1,0 +1,23 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "makissmpmod:item/baby_oil"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "scale": [5.0, 5.0, 5.0]
+    },
+    "firstperson_righthand": {
+      "scale": [5.0, 5.0, 5.0]
+    },
+    "ground": {
+      "scale": [5.0, 5.0, 5.0]
+    },
+    "gui": {
+      "scale": [5.0, 5.0, 5.0]
+    },
+    "fixed": {
+      "scale": [5.0, 5.0, 5.0]
+    }
+  }
+}

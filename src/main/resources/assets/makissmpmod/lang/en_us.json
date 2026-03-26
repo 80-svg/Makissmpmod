@@ -24,5 +24,8 @@
   "item.minecraft.lingering_potion.effect.drowsyness": "Lingering Potion of Drowsyness",
   "item.minecraft.potion.effect.long_drowsyness": "Potion of Long Drowsyness",
   "item.minecraft.splash_potion.effect.long_drowsyness": "Splash Potion of Long Drowsyness",
-  "item.minecraft.lingering_potion.effect.long_drowsyness": "Lingering Potion of Long Drowsyness"
+  "item.minecraft.lingering_potion.effect.long_drowsyness": "Lingering Potion of Long Drowsyness",
+  "item.makissmpmod.baby_oil": "Baby oil",
+  "entity.makissmpmod.example_mob": "Example Mob",
+  "item.makissmpmod.example_mob_spawn_egg": "Example Mob Spawn Egg"
 }
