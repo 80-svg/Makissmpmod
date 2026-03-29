@@ -26,6 +26,6 @@ public class ModEntityTypes {
         Makissmpmod.LOGGER.info("Registering entity types");
     }
     public static void registerAttributes() {
-        FabricDefaultAttributeRegistry.register(EPSTEIN_ENTITY, EpsteinEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(EPSTEIN_ENTITY, EpsteinEntity.createAttributes());
     }
 }

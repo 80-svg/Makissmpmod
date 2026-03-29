@@ -6,11 +6,12 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.phys.Vec3;
+import org.example.makismod.makissmpmod.effects.FlightEffect;
+import org.example.makismod.makissmpmod.effects.LethargicEffect;
+import org.example.makismod.makissmpmod.effects.WaxCoatedEffect;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,8 +25,6 @@ public final class ModEffects {
     private static final double HORIZONTAL_DRAG = 0.85D;
     private static final int LETHARGY_STILL_TICKS = 60;
     private static final double LETHARGY_MOVEMENT_EPSILON_SQUARED = 1.0E-4D;
-    private static final Identifier LETHARGY_SPEED_MODIFIER_ID =
-            Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, "lethargy_speed");
     private static final Set<UUID> FORCED_CROUCH_PLAYERS = new HashSet<>();
     private static final Map<UUID, Integer> LETHARGY_STILLNESS = new HashMap<>();
 
@@ -36,12 +35,15 @@ public final class ModEffects {
     public static final Holder<MobEffect> LETHARGY = Registry.registerForHolder(
             BuiltInRegistries.MOB_EFFECT,
             Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, "lethargy"),
-            new LethargyEffect());
+            new LethargicEffect());
     public static final Holder<MobEffect> DROWSYNESS = Registry.registerForHolder(
             BuiltInRegistries.MOB_EFFECT,
             Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, "drowsyness"),
             new DrowsynessEffect());
-
+    public static final Holder<MobEffect> FLIGHT = Registry.registerForHolder(
+            BuiltInRegistries.MOB_EFFECT,
+            Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, "flight"),
+            new FlightEffect());
     private ModEffects() {
     }
 
@@ -99,24 +101,6 @@ public final class ModEffects {
 
         player.setShiftKeyDown(true);
         FORCED_CROUCH_PLAYERS.add(playerId);
-    }
-
-    private static final class WaxCoatedEffect extends MobEffect {
-        private WaxCoatedEffect() {
-            super(MobEffectCategory.HARMFUL, 0xE5C15A);
-        }
-    }
-
-    private static final class LethargyEffect extends MobEffect {
-        private LethargyEffect() {
-            super(MobEffectCategory.HARMFUL, 0x2F2434);
-            this.addAttributeModifier(
-                    Attributes.MOVEMENT_SPEED,
-                    LETHARGY_SPEED_MODIFIER_ID,
-                    -0.5D,
-                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-            );
-        }
     }
 
     private static final class DrowsynessEffect extends MobEffect {

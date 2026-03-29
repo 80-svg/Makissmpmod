@@ -2,7 +2,9 @@ package org.example.makismod.makissmpmod;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.effect.ServerMobEffectEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.world.entity.player.Player;
 import org.example.makismod.makissmpmod.commands.NickCommand;
 import org.example.makismod.makissmpmod.commands.TpaCommand;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
@@ -11,6 +13,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import org.example.makismod.makissmpmod.effects.FlightEffect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +30,8 @@ public class Makissmpmod implements ModInitializer {
         ModEffects.initialize();
         ModItems.initialize();
         ModPotions.initialize();
+        ModEntityTypes.init();
+        ModEntityTypes.registerAttributes();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             TpaCommand.register(dispatcher);
@@ -39,9 +44,17 @@ public class Makissmpmod implements ModInitializer {
             }
             return true;
         }));
+        ServerMobEffectEvents.AFTER_REMOVE.register(((effectInstance, entity, ctx) -> {
+            if (entity instanceof Player player && effectInstance.getEffect() == ModEffects.FLIGHT) {
+                player.getAbilities().flying = false;
+                player.getAbilities().mayfly = false;
+                player.onUpdateAbilities();
+            }
+        }));
         ServerPlayConnectionEvents.JOIN.register(new ConnectionMessages());
         ServerPlayConnectionEvents.DISCONNECT.register(new ConnectionMessages());
         ServerTickEvents.END_SERVER_TICK.register(CustomShieldItem::tickActiveDashes);
+        ServerTickEvents.END_SERVER_TICK.register(FeatherItem::tickFeatherFlight);
         ServerTickEvents.END_SERVER_TICK.register(IcarusWingsItem::tickFlightDrain);
         ServerTickEvents.END_SERVER_TICK.register(ModEffects::tickWaxCoatedPlayers);
         PayloadTypeRegistry.playC2S().register(ModListPayload.MyPayLoad.ID, ModListPayload.MyPayLoad.CODEC);

@@ -27,5 +27,7 @@
   "item.minecraft.lingering_potion.effect.long_drowsyness": "Lingering Potion of Long Drowsyness",
   "item.makissmpmod.baby_oil": "Baby oil",
   "entity.makissmpmod.example_mob": "Example Mob",
-  "item.makissmpmod.example_mob_spawn_egg": "Example Mob Spawn Egg"
+  "item.makissmpmod.example_mob_spawn_egg": "Example Mob Spawn Egg",
+  "item.makissmpmod.feather_of_flight": "Feather of Flight",
+  "item.makissmpmod.lightning_smite": "Lightning smite"
 }

@@ -108,6 +108,9 @@ public class ModItems {
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.ICARUS_WINGS);
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.LOTUS);
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.BABY_OIL);
+        addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.FEATHER_OF_FLIGHT);
+        addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.LIGHTNING_SMITE);
+        addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.HEPHAESTUS_CORE);
     }
     public static final DataComponentType<Float> ICARUS_PERCENT = Registry.register(
             BuiltInRegistries.DATA_COMPONENT_TYPE,
@@ -118,6 +121,9 @@ public class ModItems {
     );
     public static final Item JUDGE_GAVEL = register("judges_gavel",
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
+    public static final Item LIGHTNING_SMITE = register("lightning_smite",
+            properties -> properties != null ? new SmiteItem(properties) : null, new SmiteItem.Properties()
+                    .stacksTo(16));
     public static final Item CUSTOM_SHIELD = register("custom_shield",
             properties -> properties != null ? new CustomShieldItem(properties) : null,
             new Item.Properties()
@@ -135,6 +141,7 @@ public class ModItems {
                     .component(DataComponents.REPAIRABLE,
                             Objects.requireNonNull(Items.SHIELD.components()
                                     .get(DataComponents.REPAIRABLE))));
+
     public static final Item BRONZE_COIN = register("bronze_coin",
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
     public static final Item SILVER_COIN = register("silver_coin",
@@ -164,6 +171,11 @@ public class ModItems {
                     ));
     public static final Item BABY_OIL = register("baby_oil",
             properties -> properties != null ? new Item(properties) : null, new Item.Properties());
+    public static final Item FEATHER_OF_FLIGHT = register("feather_of_flight",
+            properties -> properties != null ? new FeatherItem(properties) : null,
+            new FeatherItem.Properties()
+                    .stacksTo(1)
+                    .durability(FeatherItem.MAX_DURABILITY));
     public static final Map<String, DoryItem> DORYS =
             registerMaterialVariants(MAKIS_TAB_KEY, "dory", DoryItem::new, false);
     public static final Item ICARUS_WINGS = register("icarus_wings",
@@ -190,5 +202,6 @@ public class ModItems {
                     .displayItems((parameters, output) -> {
                     })
                     .build());
-
+    public static final Item HEPHAESTUS_CORE = register("hephaestus_core",
+            properties -> properties != null ? new Item(properties) : null, new Item.Properties());
 }

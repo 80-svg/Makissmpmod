@@ -16,13 +16,18 @@ public final class ModPotions {
             new Potion("drowsyness", new MobEffectInstance(ModEffects.DROWSYNESS, 20 * 30)));
     public static final Holder<Potion> LONG_DROWSYNESS = register("long_drowsyness",
             new Potion("drowsyness", new MobEffectInstance(ModEffects.DROWSYNESS, 20 * 90)));
-
+    public static final Holder<Potion> FLIGHT = register("flight",
+            new Potion("flight", new MobEffectInstance(ModEffects.FLIGHT, 20 * 30)));
+    public static final Holder<Potion> LONG_FLIGHT = register("long_flight",
+            new Potion("long_flight", new MobEffectInstance(ModEffects.FLIGHT, 20 * 90)));
     private ModPotions() {
     }
 
     public static void initialize() {
         addPotionVariantsToCreativeTab(DROWSYNESS);
         addPotionVariantsToCreativeTab(LONG_DROWSYNESS);
+        addPotionVariantsToCreativeTab(FLIGHT);
+        addPotionVariantsToCreativeTab(LONG_FLIGHT);
     }
 
     private static Holder<Potion> register(String name, Potion potion) {
