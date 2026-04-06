@@ -32,7 +32,7 @@ public class ConnectionMessages implements ServerPlayConnectionEvents.Join, Serv
     public void onPlayReady(ServerGamePacketListenerImpl serverGamePacketListener, PacketSender packetSender, MinecraftServer minecraftServer) {
     ServerPlayer player =  (ServerPlayer) serverGamePacketListener.getPlayer();
     changeMessage(minecraftServer, player, "a+", true);
-    Makissmpmod.payloadPlayers.add(player.getUUID());
+    Makissmpmod.ModlistPlayers.add(player.getUUID());
     minecraftServer.execute(() -> {
         new Thread(() -> {
            try {
@@ -41,7 +41,7 @@ public class ConnectionMessages implements ServerPlayConnectionEvents.Join, Serv
                e.printStackTrace();
            }
             minecraftServer.execute(() -> {
-                if (Makissmpmod.payloadPlayers.contains(player.getUUID())) {
+                if (Makissmpmod.ModlistPlayers.contains(player.getUUID())) {
                     player.connection.disconnect(Component.literal("Please install makissmpmod"));
                 }
             });

@@ -4,7 +4,10 @@
   "package": "org.example.makismod.makissmpmod.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "BlockInputMixin",
+    "BlockLookInputMixin",
     "EyeClosureOverlayMixin",
+    "KeyboardInputMixin",
     "LethargyCameraMixin",
     "LethargyVignetteMixin",
     "SpearCancelMixin"
