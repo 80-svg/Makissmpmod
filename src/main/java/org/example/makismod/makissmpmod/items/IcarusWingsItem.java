@@ -1,4 +1,4 @@
-package org.example.makismod.makissmpmod;
+package org.example.makismod.makissmpmod.items;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -14,6 +14,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.example.makismod.makissmpmod.ModEffects;
+import org.example.makismod.makissmpmod.ModItems;
 
 import java.util.List;
 import java.util.Map;

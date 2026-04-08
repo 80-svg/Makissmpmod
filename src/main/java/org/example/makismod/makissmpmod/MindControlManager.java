@@ -30,7 +30,7 @@ public class MindControlManager {
                 controller.getYRot(),
                 controller.getXRot()
         ));
-        controller.setGameMode(GameType.CREATIVE);
+        controller.setGameMode(GameType.SPECTATOR);
         controller.noPhysics = true;
         controllerToTarget.put(controller.getUUID(), target.getUUID());
         targetToController.put(target.getUUID(), controller.getUUID());
@@ -101,7 +101,11 @@ public class MindControlManager {
                 state.pitch(),
                 true
         );
-        controller.setGameMode(state.gameType());
+        if (state.gameType() != GameType.SPECTATOR) {
+            controller.setGameMode(state.gameType());
+        } else {
+            controller.setGameMode(GameType.SURVIVAL);
+        }
         controller.noPhysics = state.noPhysics();
     }
 

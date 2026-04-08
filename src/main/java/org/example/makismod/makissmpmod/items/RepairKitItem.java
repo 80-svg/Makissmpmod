@@ -1,4 +1,4 @@
-package org.example.makismod.makissmpmod;
+package org.example.makismod.makissmpmod.items;
 
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.example.makismod.makissmpmod.ModItems;
 import org.jspecify.annotations.NonNull;
 
 public class RepairKitItem extends Item {

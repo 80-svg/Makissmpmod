@@ -8,6 +8,9 @@ import net.minecraft.world.entity.player.Player;
 import org.example.makismod.makissmpmod.commands.MindcontrolCommand;
 import org.example.makismod.makissmpmod.commands.NickCommand;
 import org.example.makismod.makissmpmod.commands.TpaCommand;
+import org.example.makismod.makissmpmod.items.FeatherItem;
+import org.example.makismod.makissmpmod.items.IcarusWingsItem;
+import org.example.makismod.makissmpmod.items.MagnetItem;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -59,6 +62,7 @@ public class Makissmpmod implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(FeatherItem::tickFeatherFlight);
         ServerTickEvents.END_SERVER_TICK.register(IcarusWingsItem::tickFlightDrain);
         ServerTickEvents.END_SERVER_TICK.register(ModEffects::tickWaxCoatedPlayers);
+        ServerTickEvents.END_SERVER_TICK.register(MagnetItem::tickMagnetItem);
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayer controller : server.getPlayerList().getPlayers()) {
                 UUID targetId = MindControlManager.getTargetId(controller);

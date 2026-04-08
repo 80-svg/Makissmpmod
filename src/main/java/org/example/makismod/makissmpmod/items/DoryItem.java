@@ -1,4 +1,4 @@
-package org.example.makismod.makissmpmod;
+package org.example.makismod.makissmpmod.items;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;

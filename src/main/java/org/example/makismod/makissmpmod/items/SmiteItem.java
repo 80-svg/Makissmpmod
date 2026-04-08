@@ -1,4 +1,4 @@
-package org.example.makismod.makissmpmod;
+package org.example.makismod.makissmpmod.items;
 
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.example.makismod.makissmpmod.UtilClass;
 import org.jspecify.annotations.NonNull;
 
 public class SmiteItem extends Item {

@@ -6,6 +6,7 @@
   "client": [
     "BlockInputMixin",
     "BlockLookInputMixin",
+    "DisableSpectatorTabGreyMixin",
     "EyeClosureOverlayMixin",
     "KeyboardInputMixin",
     "LethargyCameraMixin",

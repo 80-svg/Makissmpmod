@@ -17,7 +17,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.component.Consumables;
 import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
-import org.example.makismod.makissmpmod.items.CigarItem;
+import org.example.makismod.makissmpmod.items.*;
 import org.spongepowered.include.com.google.common.base.Function;
 
 import java.util.*;
@@ -113,6 +113,7 @@ public class ModItems {
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.LIGHTNING_SMITE);
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.HEPHAESTUS_CORE);
         addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.CIGAR);
+        addItemsToCreativeModTab(MAKIS_TAB_KEY, ModItems.MAGNET);
     }
     public static final DataComponentType<Float> ICARUS_PERCENT = Registry.register(
             BuiltInRegistries.DATA_COMPONENT_TYPE,
@@ -210,6 +211,7 @@ public class ModItems {
             RepairKitItem::new, new RepairKitItem.Properties());
     public static final Item CIGAR = register("cigar",
             CigarItem::new, new CigarItem.Properties().stacksTo(64));
-    public static final Item MAGNEt = register("magnet",
-            Item::new, new Item.Properties());
+    public static final Item MAGNET = register("magnet",
+            MagnetItem::new, new MagnetItem.Properties()
+                    .durability(67));
 }

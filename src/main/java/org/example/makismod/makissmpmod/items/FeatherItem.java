@@ -1,13 +1,13 @@
-package org.example.makismod.makissmpmod;
+package org.example.makismod.makissmpmod.items;
 
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.example.makismod.makissmpmod.ModEffects;
+import org.example.makismod.makissmpmod.ModItems;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -41,16 +41,6 @@ public class FeatherItem extends Item {
             if (!DAMAGE_WHILE_HELD || player.tickCount % DURABILITY_TICK_INTERVAL != 0 || !offhandItem.isDamageableItem()) {
                 continue;
             }
-//            assert level != null;
-//            if (level.isClientSide()) {
-//                level.addParticle(
-//                        ParticleTypes.END_ROD,
-//                        player.getX(),
-//                        player.getY() + 1,
-//                        player.getZ(),
-//                        0, 0.1, 0
-//                );
-//            }
             offhandItem.hurtAndBreak(1, player, EquipmentSlot.OFFHAND);
         }
 

@@ -113,11 +113,15 @@ public class MakissmpmodClient implements ClientModInitializer {
             LockoutClientState.syncCamera(client);
             if (LockoutClientState.isInputLocked()) {
                 LockoutClientState.applyCapturedKeyStates(client);
-                client.gameRenderer.pick(1.0F);
                 replayControlledClicks(client);
             } else {
                 replayingAttack = false;
                 replayingUse = false;
+            }
+
+            // Suppress normal attack/use when capturing input to prevent invalid entity attacks
+            if (LockoutClientState.isCaptureEnabled() && client.gameMode != null) {
+                suppressControllerAttacks(client);
             }
 
             boolean shouldTrigger = CustomShieldItem.isBlockingComboReady(client.player)
@@ -132,6 +136,17 @@ public class MakissmpmodClient implements ClientModInitializer {
         });
     }
 
+    private static void suppressControllerAttacks(Minecraft client) {
+        // Prevent the controller from sending normal attack/use packets
+        // These are instead sent through the payload system
+        if (client.options.keyAttack.isDown()) {
+            client.options.keyAttack.setDown(false);
+        }
+        if (client.options.keyUse.isDown()) {
+            client.options.keyUse.setDown(false);
+        }
+    }
+
     private static void replayControlledClicks(Minecraft client) {
         LockoutClientState.ControlledInput input = LockoutClientState.getCapturedInput();
         if (client.player == null || client.gameMode == null) {
@@ -139,6 +154,11 @@ public class MakissmpmodClient implements ClientModInitializer {
             replayingUse = false;
             return;
         }
+
+        // Apply captured rotation before picking so hitResult matches controller's view
+        client.player.setYRot(input.yaw());
+        client.player.setXRot(input.pitch());
+        client.gameRenderer.pick(1.0F);
 
         HitResult hitResult = client.hitResult;
         if (input.attacking()) {
