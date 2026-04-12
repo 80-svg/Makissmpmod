@@ -91,11 +91,6 @@ public class ModItems {
                 .register(fabricItemGroupEntries -> fabricItemGroupEntries.accept(item));
     }
 
-    public static void addItemStackToCreativeModTab(ResourceKey<CreativeModeTab> tab, ItemStack stack) {
-        ItemGroupEvents.modifyEntriesEvent(tab)
-                .register(fabricItemGroupEntries -> fabricItemGroupEntries.accept(stack));
-    }
-
     private record MaterialVariant(String prefix, ToolMaterial tier) {
     }
 

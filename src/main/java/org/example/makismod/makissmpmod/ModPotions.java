@@ -46,6 +46,6 @@ public final class ModPotions {
 
     private static void addPotionStackToCreativeTab(Item item, Holder<Potion> potion) {
         ItemStack stack = PotionContents.createItemStack(item, potion);
-        ModItems.addItemStackToCreativeModTab(ModItems.MAKIS_TAB_KEY, stack);
+        ModItems.addItemsToCreativeModTab(ModItems.MAKIS_TAB_KEY, stack.getItem());
     }
 }
