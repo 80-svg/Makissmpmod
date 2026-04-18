@@ -63,7 +63,6 @@ public class MakissmpmodClient implements ClientModInitializer {
     public void onInitializeClient() {
         LockoutClientState.resetAll();
         loadClientSecret();
-        EntityRenderers.register(ModEntityTypes.COIN_PROJECTILE, context -> new net.minecraft.client.renderer.entity.ItemEntityRenderer(context));
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             List<String> modIds = FabricLoader.getInstance()
                             .getAllMods()

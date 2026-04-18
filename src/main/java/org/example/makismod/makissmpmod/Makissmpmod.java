@@ -19,7 +19,6 @@ import net.minecraft.world.entity.player.Player;
 import org.example.makismod.makissmpmod.commands.MindcontrolCommand;
 import org.example.makismod.makissmpmod.commands.NickCommand;
 import org.example.makismod.makissmpmod.commands.TpaCommand;
-import org.example.makismod.makissmpmod.items.CoinDeflectionHandler;
 import org.example.makismod.makissmpmod.items.FeatherItem;
 import org.example.makismod.makissmpmod.items.IcarusWingsItem;
 import org.example.makismod.makissmpmod.items.MagnetItem;
@@ -79,7 +78,6 @@ public class Makissmpmod implements ModInitializer {
                 player.onUpdateAbilities();
             }
         });
-        AttackEntityCallback.EVENT.register(CoinDeflectionHandler::onAttackEntity);
         ServerPlayConnectionEvents.JOIN.register(new ConnectionMessages());
         ServerPlayConnectionEvents.DISCONNECT.register(new ConnectionMessages());
         ServerTickEvents.END_SERVER_TICK.register(CustomShieldItem::tickActiveDashes);
