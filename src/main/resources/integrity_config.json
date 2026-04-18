@@ -1,0 +1,6 @@
+{
+  "version": "1.0.0",
+  "secret": "408898fc26e060d4f70aac551e2ff4d238c18147b0544138f38bb4bb7d780889",
+  "allowedVersions": ["*"],
+  "verificationTimeout": 10
+}

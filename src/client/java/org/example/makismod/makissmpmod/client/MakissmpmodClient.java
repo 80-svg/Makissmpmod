@@ -5,11 +5,11 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Direction;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -18,16 +18,52 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.example.makismod.makissmpmod.*;
 
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import java.util.List;
 
 public class MakissmpmodClient implements ClientModInitializer {
     private static boolean sentBlockAttackThisPress;
     private static boolean replayingAttack;
     private static boolean replayingUse;
+    private static String clientIntegritySecret = "";
+
+    public static String computeClientHmac(String data, String key) {
+        try {
+            javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
+            javax.crypto.spec.SecretKeySpec sk = new javax.crypto.spec.SecretKeySpec(key.getBytes(), "HmacSHA256");
+            mac.init(sk);
+            byte[] hmacBytes = mac.doFinal(data.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hmacBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            return "error";
+        }
+    }
+
+    private static void loadClientSecret() {
+        try (InputStream secretIs = MakissmpmodClient.class.getResourceAsStream("/integrity_secret.txt")) {
+            if (secretIs != null) {
+                clientIntegritySecret = new String(secretIs.readAllBytes()).trim();
+                System.out.println("INTEGRITY: Client loaded secret (" + clientIntegritySecret.length() + " chars)");
+            } else {
+                System.out.println("INTEGRITY: Failed to load client secret - not found in classpath");
+            }
+        } catch (Exception e) {
+            System.out.println("INTEGRITY: Client secret load error: " + e);
+        }
+    }
 
     @Override
     public void onInitializeClient() {
         LockoutClientState.resetAll();
+        loadClientSecret();
+        EntityRenderers.register(ModEntityTypes.COIN_PROJECTILE, context -> new net.minecraft.client.renderer.entity.ItemEntityRenderer(context));
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             List<String> modIds = FabricLoader.getInstance()
                             .getAllMods()
@@ -37,6 +73,16 @@ public class MakissmpmodClient implements ClientModInitializer {
             sender.sendPacket(new ModListPayload.MyPayLoad(modIds));
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> LockoutClientState.resetAll());
+        ClientPlayNetworking.registerGlobalReceiver(IntegrityPayloads.IntegrityChallengeS2C.ID, (payload, context) -> {
+            context.client().execute(() -> {
+                String hmac = computeClientHmac(payload.challenge(), clientIntegritySecret);
+                ClientPlayNetworking.send(new IntegrityPayloads.IntegrityResponseC2S(
+                        payload.challenge(),
+                        hmac,
+                        Makissmpmod.MOD_VERSION
+                ));
+            });
+        });
         ClientPlayNetworking.registerGlobalReceiver(LockoutPayload.lockoutoutpayload.ID, (payload, context) -> {
             context.client().execute(() -> {
                 LockoutClientState.setInputLocked(payload.playerLockedInput());

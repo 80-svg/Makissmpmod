@@ -87,6 +87,22 @@ jar {
     }
 }
 
+def generateIntegritySecret = tasks.register("generateIntegritySecret") {
+    doLast {
+        def secretFile = file("src/main/resources/integrity_secret.txt")
+        def random = new java.security.SecureRandom()
+        def bytes = new byte[32]
+        random.nextBytes(bytes)
+        def secret = bytes.encodeHex().toString()
+        secretFile.text = secret
+        logger.info("Generated integrity secret: ${secret.take(8)}...")
+    }
+}
+
+tasks.named("processResources").configure {
+    dependsOn(generateIntegritySecret)
+}
+
 // configure the maven publication
 publishing {
     publications {

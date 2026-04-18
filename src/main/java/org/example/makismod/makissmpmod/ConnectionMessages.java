@@ -34,6 +34,14 @@ public class ConnectionMessages implements ServerPlayConnectionEvents.Join, Serv
     changeMessage(minecraftServer, player, "a+", true);
     Makissmpmod.ModlistPlayers.add(player.getUUID());
     minecraftServer.execute(() -> {
+        Makissmpmod.sendIntegrityChallenge(player);
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            minecraftServer.execute(() -> {
+                if (Makissmpmod.pendingChallenges.containsKey(player.getUUID())) {
+                    player.connection.disconnect(Component.literal("Integrity verification timed out - please rejoin"));
+                }
+            });
+        }, Makissmpmod.VERIFICATION_TIMEOUT, TimeUnit.SECONDS);
         new Thread(() -> {
            try {
                Thread.sleep(1000);
