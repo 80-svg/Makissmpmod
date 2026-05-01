@@ -33,14 +33,18 @@ repositories {
     // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html
     // for more information about repositories.
+    maven {
+        url "https://www.cursemaven.com"
+        content { includeGroup "curse.maven"}
+    }
 }
-
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
+//    // FABRIC
+//    modImplementation "curse.maven:watermedia-869524:30016"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 

@@ -6,7 +6,6 @@
   "mixins": [
     "AntiMobFarm",
     "DisableEnd",
-    "DisableFortune",
     "DisableTrading",
     "PlayerNickMixin",
     "PreserveWaxCoatedOnMilk",

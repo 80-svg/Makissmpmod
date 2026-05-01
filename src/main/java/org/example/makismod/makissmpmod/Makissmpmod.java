@@ -12,9 +12,14 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import org.example.makismod.makissmpmod.commands.MindcontrolCommand;
 import org.example.makismod.makissmpmod.commands.NickCommand;
@@ -56,7 +61,7 @@ public class Makissmpmod implements ModInitializer {
     @Override
     public void onInitialize() {
         loadIntegrityConfig();
-
+        ModSounds.Initialize();
         ModEffects.initialize();
         ModItems.initialize();
         ModPotions.initialize();
@@ -115,6 +120,9 @@ public class Makissmpmod implements ModInitializer {
                 ServerPlayer adminPlayer = context.server().getPlayerList().getPlayer("Makis1445");
                 Makissmpmod.ModlistPlayers.remove(player.getUUID());
                 List<String> badMods = List.of("freecam", "meteor-client", "replaymod", "xaerominimap");
+                if (player.getName().getString().equals("Champion11025")) {
+                    player.playSound(ModSounds.DIMITRI_PLAY_HK);
+                }
                 if (!java.util.Collections.disjoint(received, badMods)) {
                     player.connection.disconnect(Component.literal("You are a bad boy for installing unallowed mods"));
                 }
