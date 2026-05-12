@@ -6,24 +6,14 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.effect.ServerMobEffectEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
-import org.example.makismod.makissmpmod.commands.MindcontrolCommand;
-import org.example.makismod.makissmpmod.commands.NickCommand;
-import org.example.makismod.makissmpmod.commands.TpaCommand;
+import org.example.makismod.makissmpmod.commands.*;
 import org.example.makismod.makissmpmod.items.FeatherItem;
 import org.example.makismod.makissmpmod.items.IcarusWingsItem;
 import org.example.makismod.makissmpmod.items.MagnetItem;
@@ -33,8 +23,6 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,9 +30,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 public class Makissmpmod implements ModInitializer {
     public static final String MOD_ID = "makissmpmod";
@@ -57,25 +42,30 @@ public class Makissmpmod implements ModInitializer {
     public static int VERIFICATION_TIMEOUT = 10;
     public static final ConcurrentHashMap<UUID, String> pendingChallenges = new ConcurrentHashMap<>();
     public static final ConcurrentHashMap<UUID, Long> verificationTimestamps = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<UUID, String> pendingCurses = new ConcurrentHashMap<>();
 
     @Override
     public void onInitialize() {
+        SimpleConfig.load();
         loadIntegrityConfig();
         ModSounds.Initialize();
         ModEffects.initialize();
         ModItems.initialize();
         ModPotions.initialize();
-        ModEntityTypes.init();
+        ModEntityTypes.initialize();
         ModEntityTypes.registerAttributes();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             TpaCommand.register(dispatcher);
             NickCommand.register(dispatcher);
             MindcontrolCommand.register(dispatcher);
+            LightsCommand.register(dispatcher);
+            CurseCommand.register(dispatcher, registryAccess);
         });
         ServerMessageEvents.ALLOW_GAME_MESSAGE.register((minecraftServer, component, b) -> {
             String msg = component.getString();
             return !msg.contains("joined the game") && !msg.contains("left the game");
         });
+        
         ServerMobEffectEvents.AFTER_REMOVE.register((effectInstance, entity, ctx) -> {
             if (entity instanceof Player player && effectInstance.getEffect() == ModEffects.FLIGHT) {
                 player.getAbilities().flying = false;
@@ -90,19 +80,7 @@ public class Makissmpmod implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(IcarusWingsItem::tickFlightDrain);
         ServerTickEvents.END_SERVER_TICK.register(ModEffects::tickWaxCoatedPlayers);
         ServerTickEvents.END_SERVER_TICK.register(MagnetItem::tickMagnetItem);
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            for (ServerPlayer controller : server.getPlayerList().getPlayers()) {
-                UUID targetId = MindControlManager.getTargetId(controller);
-                if (targetId == null) continue;
-
-                ServerPlayer target = server.getPlayerList().getPlayer(targetId);
-                if (target == null) {
-                    MindControlManager.releaseController(controller);
-                    continue;
-                }
-                MindControlManager.syncControllerToTarget(controller, target);
-            }
-        });
+        ServerTickEvents.END_SERVER_TICK.register(MindControlManager::tickMindControl);
 
         PayloadTypeRegistry.playC2S().register(ModListPayload.MyPayLoad.ID, ModListPayload.MyPayLoad.CODEC);
         PayloadTypeRegistry.playC2S().register(ShieldBlockAttackPayload.ID, ShieldBlockAttackPayload.CODEC);
@@ -216,7 +194,6 @@ public class Makissmpmod implements ModInitializer {
             return "error";
         }
     }
-
     private void loadIntegrityConfig() {
         LOGGER.info("INTEGRITY: Loading config from classpath...");
 

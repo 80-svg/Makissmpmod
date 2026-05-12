@@ -1,5 +1,6 @@
 package org.example.makismod.makissmpmod;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -107,6 +108,20 @@ public class MindControlManager {
             controller.setGameMode(GameType.SURVIVAL);
         }
         controller.noPhysics = state.noPhysics();
+    }
+
+    public static void tickMindControl(MinecraftServer server) {
+        for (ServerPlayer controller : server.getPlayerList().getPlayers()) {
+            UUID targetId = MindControlManager.getTargetId(controller);
+            if (targetId == null) continue;
+
+            ServerPlayer target = server.getPlayerList().getPlayer(targetId);
+            if (target == null) {
+                MindControlManager.releaseController(controller);
+                continue;
+            }
+            MindControlManager.syncControllerToTarget(controller, target);
+        }
     }
 
     private record ControllerReturnState(

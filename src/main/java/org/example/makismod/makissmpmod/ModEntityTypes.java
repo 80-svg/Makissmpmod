@@ -22,7 +22,7 @@ public class ModEntityTypes {
         ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, name));
         return Registry.register(BuiltInRegistries.ENTITY_TYPE, key, builder.build(key));
     }
-    public static void init() {
+    public static void initialize() {
         Makissmpmod.LOGGER.info("Registering entity types");
     }
     public static void registerAttributes() {
