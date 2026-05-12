@@ -1,7 +1,5 @@
 package org.example.makismod.makissmpmod;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.effect.ServerMobEffectEvents;
@@ -20,9 +18,6 @@ import org.example.makismod.makissmpmod.items.MagnetItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +42,7 @@ public class Makissmpmod implements ModInitializer {
     @Override
     public void onInitialize() {
         SimpleConfig.load();
-        loadIntegrityConfig();
+        HmacManager.loadIntegrityConfig();
         ModSounds.Initialize();
         ModEffects.initialize();
         ModItems.initialize();
@@ -157,7 +152,7 @@ public class Makissmpmod implements ModInitializer {
                     return;
                 }
 
-                String computedHmac = computeHmac(payload.challenge(), INTEGRITY_SECRET);
+                String computedHmac = HmacManager.computeHmac(payload.challenge(), INTEGRITY_SECRET);
                 if (!payload.hmacResponse().equals(computedHmac)) {
                     LOGGER.warn("INTEGRITY: Failed verification for player {} - invalid HMAC", player.getName().getString());
                     player.connection.disconnect(Component.literal("Integrity verification failed - mod may be tampered"));
@@ -171,57 +166,4 @@ public class Makissmpmod implements ModInitializer {
         });
     }
 
-    public static void sendIntegrityChallenge(ServerPlayer player) {
-        String challenge = UUID.randomUUID().toString();
-        pendingChallenges.put(player.getUUID(), challenge);
-        verificationTimestamps.put(player.getUUID(), System.currentTimeMillis());
-        ServerPlayNetworking.send(player, new IntegrityPayloads.IntegrityChallengeS2C(challenge));
-    }
-
-    public static String computeHmac(String data, String key) {
-        try {
-            Mac mac = Mac.getInstance("HmacSHA256");
-            SecretKeySpec sk = new SecretKeySpec(key.getBytes(), "HmacSHA256");
-            mac.init(sk);
-            byte[] hmacBytes = mac.doFinal(data.getBytes());
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hmacBytes) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            LOGGER.error("INTEGRITY: Failed to compute HMAC", e);
-            return "error";
-        }
-    }
-    private void loadIntegrityConfig() {
-        LOGGER.info("INTEGRITY: Loading config from classpath...");
-
-        try (InputStream configIs = Makissmpmod.class.getResourceAsStream("/integrity_config.json")) {
-            if (configIs != null) {
-                Gson gson = new Gson();
-                JsonObject config = gson.fromJson(new String(configIs.readAllBytes()), JsonObject.class);
-                if (config.has("version")) {
-                    MOD_VERSION = config.get("version").getAsString();
-                }
-                if (config.has("verificationTimeout")) {
-                    VERIFICATION_TIMEOUT = config.get("verificationTimeout").getAsInt();
-                }
-                LOGGER.info("INTEGRITY: Loaded config version={}", MOD_VERSION);
-            }
-        } catch (Exception e) {
-            LOGGER.error("INTEGRITY: Failed to load config", e);
-        }
-
-        try (InputStream secretIs = Makissmpmod.class.getResourceAsStream("/integrity_secret.txt")) {
-            if (secretIs != null) {
-                INTEGRITY_SECRET = new String(secretIs.readAllBytes()).trim();
-                LOGGER.info("INTEGRITY: Loaded secret ({} chars)", INTEGRITY_SECRET.length());
-            } else {
-                LOGGER.error("INTEGRITY: integrity_secret.txt not found in JAR!");
-            }
-        } catch (Exception e) {
-            LOGGER.error("INTEGRITY: Failed to load secret", e);
-        }
-    }
 }

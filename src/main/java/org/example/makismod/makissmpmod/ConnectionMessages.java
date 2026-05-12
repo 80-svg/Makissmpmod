@@ -34,7 +34,7 @@ public class ConnectionMessages implements ServerPlayConnectionEvents.Join, Serv
     changeMessage(minecraftServer, player, "a+", true);
     Makissmpmod.ModlistPlayers.add(player.getUUID());
     minecraftServer.execute(() -> {
-        Makissmpmod.sendIntegrityChallenge(player);
+        HmacManager.sendIntegrityChallenge(player);
         Executors.newSingleThreadScheduledExecutor().schedule(() -> {
             minecraftServer.execute(() -> {
                 if (Makissmpmod.pendingChallenges.containsKey(player.getUUID())) {
