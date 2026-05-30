@@ -3,7 +3,7 @@ package org.example.makismod.makissmpmod.client;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier; // Using Identifier as requested
-import org.example.makismod.makissmpmod.entity.EpsteinEntity;
+import org.example.makismod.makissmpmod.entity.custom.EpsteinEntity;
 
 public class EpsteinEntityRenderer extends MobRenderer<EpsteinEntity, EpsteinEntityRenderState, EpsteinEntityModel> {
 

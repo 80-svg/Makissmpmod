@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import org.example.makismod.makissmpmod.entity.EpsteinEntity;
+import org.example.makismod.makissmpmod.entity.custom.EpsteinEntity;
 
 public class ModEntityTypes {
     public static final EntityType<EpsteinEntity> EPSTEIN_ENTITY = register(

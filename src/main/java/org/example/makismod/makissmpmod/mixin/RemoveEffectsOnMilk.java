@@ -1,10 +1,14 @@
 package org.example.makismod.makissmpmod.mixin;
 
+import net.minecraft.core.Holder;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.example.makismod.makissmpmod.ModAttachments;
 import org.example.makismod.makissmpmod.ModEffects;
+import org.example.makismod.makissmpmod.commands.CurseCommand;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public class PreserveWaxCoatedOnMilk {
+public class RemoveEffectsOnMilk {
     @Unique
     private MobEffectInstance makissmpmod$preservedWaxCoated;
 
@@ -20,7 +24,8 @@ public class PreserveWaxCoatedOnMilk {
     private void preserveWaxCoatedBeforeMilk(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
         ItemStack useItem = livingEntity.getUseItem();
-        if (!useItem.is(Items.MILK_BUCKET) || !livingEntity.hasEffect(ModEffects.WAX_COATED)) {
+        Holder<MobEffect> effect = CurseCommand.effectFromId(livingEntity.getAttachedOrElse(ModAttachments.CURSE_EFFECTS, null));
+        if (!useItem.is(Items.MILK_BUCKET) || !livingEntity.hasEffect(effect)) {
             this.makissmpmod$preservedWaxCoated = null;
             return;
         }

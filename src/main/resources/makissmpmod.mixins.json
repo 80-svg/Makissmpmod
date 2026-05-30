@@ -8,7 +8,7 @@
     "DisableEnd",
     "DisableTrading",
     "PlayerNickMixin",
-    "PreserveWaxCoatedOnMilk",
+    "RemoveEffectsOnMilk",
     "ServerPlayerNickMixin"
   ],
   "injectors": {

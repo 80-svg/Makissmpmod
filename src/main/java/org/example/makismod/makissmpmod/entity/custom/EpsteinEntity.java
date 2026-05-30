@@ -1,4 +1,4 @@
-package org.example.makismod.makissmpmod.entity;
+package org.example.makismod.makissmpmod.entity.custom;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
@@ -7,10 +7,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.TemptGoal;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
-import org.example.makismod.makissmpmod.Makissmpmod;
 import org.example.makismod.makissmpmod.ModItems;
 
 public class EpsteinEntity extends PathfinderMob {

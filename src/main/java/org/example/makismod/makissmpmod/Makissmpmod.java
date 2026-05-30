@@ -43,6 +43,7 @@ public class Makissmpmod implements ModInitializer {
     public void onInitialize() {
         SimpleConfig.load();
         HmacManager.loadIntegrityConfig();
+        ModAttachments.initialize();
         ModSounds.Initialize();
         ModEffects.initialize();
         ModItems.initialize();
@@ -68,15 +69,19 @@ public class Makissmpmod implements ModInitializer {
                 player.onUpdateAbilities();
             }
         });
+        // Run code when someone joins or disconnects
         ServerPlayConnectionEvents.JOIN.register(new ConnectionMessages());
         ServerPlayConnectionEvents.DISCONNECT.register(new ConnectionMessages());
+        // These run every tick
         ServerTickEvents.END_SERVER_TICK.register(CustomShieldItem::tickActiveDashes);
         ServerTickEvents.END_SERVER_TICK.register(FeatherItem::tickFeatherFlight);
         ServerTickEvents.END_SERVER_TICK.register(IcarusWingsItem::tickFlightDrain);
         ServerTickEvents.END_SERVER_TICK.register(ModEffects::tickWaxCoatedPlayers);
         ServerTickEvents.END_SERVER_TICK.register(MagnetItem::tickMagnetItem);
         ServerTickEvents.END_SERVER_TICK.register(MindControlManager::tickMindControl);
+        ServerTickEvents.END_SERVER_TICK.register(CurseCommand::tickPermanentEffect);
 
+        // Custom Packet Payloads
         PayloadTypeRegistry.playC2S().register(ModListPayload.MyPayLoad.ID, ModListPayload.MyPayLoad.CODEC);
         PayloadTypeRegistry.playC2S().register(ShieldBlockAttackPayload.ID, ShieldBlockAttackPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(MindControlInputPayload.ControllerInputC2SPayload.ID, MindControlInputPayload.ControllerInputC2SPayload.CODEC);
@@ -165,5 +170,4 @@ public class Makissmpmod implements ModInitializer {
             });
         });
     }
-
 }

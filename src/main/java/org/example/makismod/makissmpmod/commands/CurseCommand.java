@@ -17,10 +17,14 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.player.Player;
 import org.example.makismod.makissmpmod.Makissmpmod;
+import org.example.makismod.makissmpmod.ModAttachments;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -48,6 +52,7 @@ public class CurseCommand {
         ServerPlayer player = context.getSource().getPlayer();
         ServerPlayer target = EntityArgument.getPlayer(context, "target");
         Holder.Reference<MobEffect> effect = ResourceArgument.getMobEffect(context, "effects");
+        assert player != null;
         if (player.getUUID().equals(target.getUUID())) {
             player.sendSystemMessage(Component.literal("You cannot curse yourself.").withStyle(ChatFormatting.RED));
             return 0;
@@ -78,6 +83,7 @@ public class CurseCommand {
         Holder.Reference<MobEffect> effect = ResourceArgument.getMobEffect(context, "effects");
         boolean doesPlayerAccept = BoolArgumentType.getBool(context, "doesPlayerAccept");
         String token = StringArgumentType.getString(context, "token");
+        assert player != null;
         String expectedToken = Makissmpmod.pendingCurses.remove(player.getUUID());
         if (!token.equals(expectedToken)) {
             player.sendSystemMessage(Component.literal("Invalid curse confirmation.").withStyle(ChatFormatting.RED));
@@ -89,6 +95,8 @@ public class CurseCommand {
             return 0;
         }
 
+        target.setAttached(ModAttachments.CURSE_PLAYER, player.getUUID());
+        target.setAttached(ModAttachments.CURSE_EFFECTS, effectId(effect));
         target.addEffect(new MobEffectInstance(effect, Integer.MAX_VALUE, 0, false, true, true));
         player.sendSystemMessage(Component.literal("Applied " + effectId(effect) + " to " + target.getName().getString() + ".")
                 .withStyle(ChatFormatting.GREEN));
@@ -96,6 +104,20 @@ public class CurseCommand {
     }
 
     private static String effectId(Holder.Reference<MobEffect> effect) {
-        return BuiltInRegistries.MOB_EFFECT.getKey(effect.value()).toString();
+        return Objects.requireNonNull(BuiltInRegistries.MOB_EFFECT.getKey(effect.value())).toString();
     }
+
+    public static Holder<MobEffect> effectFromId(String effectId) {
+        MobEffect effect = BuiltInRegistries.MOB_EFFECT.getOptional(Identifier.parse(effectId))
+                .orElseThrow(() -> new IllegalArgumentException("Unknown mob effect id: " + effectId));
+        return BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect);
+    }
+    public static void tickPermanentEffect(MinecraftServer server) {
+        for (Player p : server.getPlayerList().getPlayers()) {
+            if (p.hasAttached(ModAttachments.CURSE_EFFECTS)) {
+                p.addEffect(new MobEffectInstance(effectFromId(p.getAttached(ModAttachments.CURSE_EFFECTS)), Integer.MAX_VALUE, 0, false, true, true));
+            }
+        }
+    }
+
 }
