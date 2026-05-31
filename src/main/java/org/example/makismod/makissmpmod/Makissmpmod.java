@@ -32,6 +32,7 @@ public class Makissmpmod implements ModInitializer {
     public static final Set<UUID> lockoutPlayers = new HashSet<>();
     public static final Logger LOGGER = LoggerFactory.getLogger("Makissmpmod");
 
+    public static final Boolean enableHMAC = false;
     public static String INTEGRITY_SECRET = "";
     public static String MOD_VERSION = "1.0.0";
     public static int VERIFICATION_TIMEOUT = 10;
@@ -144,29 +145,31 @@ public class Makissmpmod implements ModInitializer {
 
         ServerPlayNetworking.registerGlobalReceiver(IntegrityPayloads.IntegrityResponseC2S.ID, (payload, context) -> {
             context.server().execute(() -> {
-                ServerPlayer player = context.player();
-                UUID playerId = player.getUUID();
-                String expectedChallenge = pendingChallenges.get(playerId);
+                if (enableHMAC) {
+                    ServerPlayer player = context.player();
+                    UUID playerId = player.getUUID();
+                    String expectedChallenge = pendingChallenges.get(playerId);
 
-                if (expectedChallenge == null) {
-                    player.connection.disconnect(Component.literal("Integrity verification expired - please rejoin"));
-                    return;
-                }
-                if (!payload.challenge().equals(expectedChallenge)) {
-                    player.connection.disconnect(Component.literal("Integrity verification failed - invalid challenge"));
-                    return;
-                }
+                    if (expectedChallenge == null) {
+                        player.connection.disconnect(Component.literal("Integrity verification expired - please rejoin"));
+                        return;
+                    }
+                    if (!payload.challenge().equals(expectedChallenge)) {
+                        player.connection.disconnect(Component.literal("Integrity verification failed - invalid challenge"));
+                        return;
+                    }
 
-                String computedHmac = HmacManager.computeHmac(payload.challenge(), INTEGRITY_SECRET);
-                if (!payload.hmacResponse().equals(computedHmac)) {
-                    LOGGER.warn("INTEGRITY: Failed verification for player {} - invalid HMAC", player.getName().getString());
-                    player.connection.disconnect(Component.literal("Integrity verification failed - mod may be tampered"));
-                    return;
-                }
+                    String computedHmac = HmacManager.computeHmac(payload.challenge(), INTEGRITY_SECRET);
+                    if (!payload.hmacResponse().equals(computedHmac)) {
+                        LOGGER.warn("INTEGRITY: Failed verification for player {} - invalid HMAC", player.getName().getString());
+                        player.connection.disconnect(Component.literal("Integrity verification failed - mod may be tampered"));
+                        return;
+                    }
 
-                pendingChallenges.remove(playerId);
-                verificationTimestamps.remove(playerId);
-                LOGGER.info("INTEGRITY: Player {} verified successfully", player.getName().getString());
+                    pendingChallenges.remove(playerId);
+                    verificationTimestamps.remove(playerId);
+                    LOGGER.info("INTEGRITY: Player {} verified successfully", player.getName().getString());
+                }
             });
         });
     }
