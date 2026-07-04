@@ -2,6 +2,8 @@ package org.example.makismod.makissmpmod;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.entity.event.v1.effect.ServerMobEffectEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
@@ -9,6 +11,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.example.makismod.makissmpmod.commands.*;
@@ -43,9 +46,9 @@ public class Makissmpmod implements ModInitializer {
     @Override
     public void onInitialize() {
         SimpleConfig.load();
-        HmacManager.loadIntegrityConfig();
+        if (enableHMAC) HmacManager.loadIntegrityConfig();
         ModAttachments.initialize();
-        ModSounds.Initialize();
+        ModSounds.initialize();
         ModEffects.initialize();
         ModItems.initialize();
         ModPotions.initialize();
@@ -62,7 +65,20 @@ public class Makissmpmod implements ModInitializer {
             String msg = component.getString();
             return !msg.contains("joined the game") && !msg.contains("left the game");
         });
-        
+        // Death Event
+        ServerPlayerEvents.AFTER_RESPAWN.register((player, target, value) -> {
+
+        });
+        ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
+            if (entity instanceof ServerPlayer player && player.hasAttached(ModAttachments.WHO_CURSED)) {
+                ServerLevel level = (ServerLevel) entity.level();
+                UUID uuid = player.getAttached(ModAttachments.WHO_CURSED);
+                Player target = level.getPlayerByUUID(uuid);
+                if (target != null) {
+
+                }
+            }
+        });
         ServerMobEffectEvents.AFTER_REMOVE.register((effectInstance, entity, ctx) -> {
             if (entity instanceof Player player && effectInstance.getEffect() == ModEffects.FLIGHT) {
                 player.getAbilities().flying = false;
@@ -147,6 +163,7 @@ public class Makissmpmod implements ModInitializer {
             context.server().execute(() -> {
                 if (enableHMAC) {
                     ServerPlayer player = context.player();
+
                     UUID playerId = player.getUUID();
                     String expectedChallenge = pendingChallenges.get(playerId);
 

@@ -94,7 +94,7 @@ public class CurseCommand {
             player.sendSystemMessage(Component.literal("Curse cancelled.").withStyle(ChatFormatting.RED));
             return 0;
         }
-
+        player.setAttached(ModAttachments.WHO_CURSED, target.getUUID());
         target.setAttached(ModAttachments.CURSE_PLAYER, player.getUUID());
         target.setAttached(ModAttachments.CURSE_EFFECTS, effectId(effect));
         target.addEffect(new MobEffectInstance(effect, Integer.MAX_VALUE, 0, false, true, true));

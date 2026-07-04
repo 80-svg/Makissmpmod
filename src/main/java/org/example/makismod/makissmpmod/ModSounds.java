@@ -13,7 +13,7 @@ public class ModSounds {
         Identifier identifier = Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, id);
         return Registry.register(BuiltInRegistries.SOUND_EVENT, identifier, SoundEvent.createVariableRangeEvent(identifier));
     }
-    public static void Initialize() {
+    public static void initialize() {
         Makissmpmod.LOGGER.info("Initializing ModSounds");
     }
 }

@@ -36,8 +36,9 @@ public class ConnectionMessages implements ServerPlayConnectionEvents.Join, Serv
     minecraftServer.execute(() -> {
         HmacManager.sendIntegrityChallenge(player);
         Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+
             minecraftServer.execute(() -> {
-                if (Makissmpmod.pendingChallenges.containsKey(player.getUUID())) {
+                if (Makissmpmod.pendingChallenges.containsKey(player.getUUID()) && Makissmpmod.enableHMAC) {
                     player.connection.disconnect(Component.literal("Integrity verification timed out - please rejoin"));
                 }
             });

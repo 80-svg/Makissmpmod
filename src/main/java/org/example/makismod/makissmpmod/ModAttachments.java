@@ -11,6 +11,8 @@ public final class ModAttachments {
             Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, "curse_player"));
     public static final AttachmentType<String> CURSE_EFFECTS = AttachmentRegistry.create(
             Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, "curse_effects"));
+    public static final AttachmentType<UUID> WHO_CURSED = AttachmentRegistry.create(
+            Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, "who_cursed"));
     // Not needed because I can probably do hasAttached() on CURSE_EFFECTS and removeAttached() accordingly.
 //    public static final AttachmentType<Boolean> IS_CURSED = AttachmentRegistry.create(
 //            Identifier.fromNamespaceAndPath(Makissmpmod.MOD_ID, "is_cursed"));
