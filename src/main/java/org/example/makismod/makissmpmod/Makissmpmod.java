@@ -34,7 +34,7 @@ public class Makissmpmod implements ModInitializer {
     public static final Set<UUID> ModlistPlayers = new HashSet<>();
     public static final Set<UUID> lockoutPlayers = new HashSet<>();
     public static final Logger LOGGER = LoggerFactory.getLogger("Makissmpmod");
-
+    public static final String specialPlayer = "Makis1445";
     public static final Boolean enableHMAC = false;
     public static String INTEGRITY_SECRET = "";
     public static String MOD_VERSION = "1.0.0";
@@ -112,7 +112,7 @@ public class Makissmpmod implements ModInitializer {
             context.server().execute(() -> {
                 List<String> received = myPayLoad.message();
                 ServerPlayer player = context.player();
-                ServerPlayer adminPlayer = context.server().getPlayerList().getPlayer("Makis1445");
+                ServerPlayer adminPlayer = context.server().getPlayerList().getPlayer(specialPlayer);
                 Makissmpmod.ModlistPlayers.remove(player.getUUID());
                 List<String> badMods = List.of("freecam", "meteor-client", "replaymod", "xaerominimap");
                 if (player.getName().getString().equals("Champion11025")) {
